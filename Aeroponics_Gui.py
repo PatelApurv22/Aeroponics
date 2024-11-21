@@ -1,3 +1,4 @@
+
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -54,14 +55,35 @@ def plot_data():
 
         axs = axs.flatten()  # Flatten axs for easy iteration
 
+        # for idx, col in enumerate(columns_to_plot):
+        #     axs[idx].plot(filtered_df['Timestamp'], filtered_df[col], color=color_var.get(), marker=marker_var.get())
+        #     axs[idx].set_title(f"{col}", fontsize=10)
+        #     axs[idx].set(xlabel='Timestamp', ylabel=col)
+            
+        #     # Format x-axis ticks with reduced size and rotation
+        #     # axs[idx].xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: pd.to_datetime(x).strftime('%H:%M:%S')))
+        #     axs[idx].tick_params(axis='x', rotation=0, labelsize=5)
         for idx, col in enumerate(columns_to_plot):
-            axs[idx].plot(filtered_df['Timestamp'], filtered_df[col], color=color_var.get(), marker=marker_var.get())
+            
+            axs[idx].plot(filtered_df['Timestamp'], filtered_df[col], 
+                        color=color_var.get() if color_var else 'blue', 
+                        marker=marker_var.get() if marker_var else 'o')
             axs[idx].set_title(f"{col}", fontsize=10)
             axs[idx].set(xlabel='Timestamp', ylabel=col)
+
+            # Format x-axis ticks without overlap
+            try:
+                axs[idx].xaxis.set_major_locator(plt.MaxNLocator(nbins=6))  # Limit to 6 ticks to prevent overlap
+                # axs[idx].xaxis.set_major_formatter(plt.FuncFormatter(
+                #     lambda x, _: pd.to_datetime(x).strftime('%H:%M:%S')
+                # ))
+            except Exception as e:
+                axs[idx].set_xlabel('Timestamp (Invalid Format)')
+                print(f"Error formatting x-axis: {e}")
             
-            # Format x-axis ticks with reduced size and rotation
-            axs[idx].xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: pd.to_datetime(x).strftime('%H:%M:%S')))
-            axs[idx].tick_params(axis='x', rotation=30, labelsize=8)
+            # Keep x-axis labels without rotation
+            axs[idx].tick_params(axis='x', rotation=0, labelsize=6)
+
 
         # Remove unused subplots
         for ax in axs[num_plots:]:
